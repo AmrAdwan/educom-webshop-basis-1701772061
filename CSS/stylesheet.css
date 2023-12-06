@@ -36,12 +36,6 @@ ul.menu li > a {
   text-decoration: none; /* Removes underline from links */
   padding: 5px 10px; /* Adds some padding around the link text */
 }
-
-
-.menuBar {
-  background-color:dodgerblue;
-}
-
 .input {
   width: 400px;
 }

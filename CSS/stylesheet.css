@@ -46,3 +46,7 @@ footer {
   font-size: 10px;
   text-align: right;
 }
+
+.error { 
+  color: red; 
+}

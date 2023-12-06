@@ -19,18 +19,24 @@ h1 {
 }
 
 
-ul, li {
-  display: inline;
-  margin: 10%; padding: 0;
+ul.menu {
+  list-style: none; /* Removes bullets */
+  padding: 0; /* Removes default padding */
+  margin: 0; /* Removes default margin */
 }
 
-a:link {
-  text-decoration: none;
+ul.menu li {
+  display: inline-block; /* Displays list items in a line */
+  margin-right: 10px; /* Adds some space between menu items */
 }
 
-a {
-  color: white;
+ul.menu li > a {
+  color: white; /* Sets text color to white */
+  background-color: rgb(85, 189, 224); /* Sets background color to blue */
+  text-decoration: none; /* Removes underline from links */
+  padding: 5px 10px; /* Adds some padding around the link text */
 }
+
 
 .menuBar {
   background-color:dodgerblue;

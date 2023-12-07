@@ -9,141 +9,62 @@
 <body>
   <?php
   // initate the variables 
-  $geslacht = $naam = $email = $telefoon = $straat = $huisnummer = $toevoeging = $postcode = 
-  $stad = $provincie = $land = $bericht = $contactmethode = '';
-  $geslachtErr = $naamErr = $emailErr = $telefoonErr = $straatErr = 
-  $huisnummerErr = $postcodeErr = $stadErr = $provincieErr = $landErr = 
-  $berichtErr = $contactmethodeErr = '';
+  $gender = $name = $email = $phone = $street = $housenumber = $addition = $zipcode = 
+  $city = $province = $country = $message = $contactmethod = '';
+  $genderErr = $nameErr = $emailErr = $phoneErr = $streetErr = 
+  $housenumberErr = $zipcodeErr = $cityErr = $provinceErr = $countryErr = 
+  $messageErr = $contactmethodErr = '';
   
   $valid = false;
 
   // Controleren of het formulier is verstuurd
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verzamel de ingevoerde waarden
-    $geslacht = $_POST['geslacht'] ?? '';
-    $naam = $_POST['Naam'] ?? '';
+    $gender = $_POST['gender'] ?? '';
+    $name = $_POST['name'] ?? '';
     $email = $_POST['email'] ?? '';
-    $telefoon = $_POST['telefoon'] ?? '';
-    $straat = $_POST['straat'] ?? '';
-    $huisnummer = $_POST['huisnummer'] ?? '';
-    $toevoeging = $_POST['address toevoeging'] ?? '';
-    $postcode = $_POST['zip'] ?? '';
-    $stad = $_POST['stad'] ?? '';
-    $provincie = $_POST['state'] ??'';
-    $land = $_POST['land'] ?? '';
-    $bericht = $_POST['bericht'] ?? '';
-    $contactmethode = $_POST['contact'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+    $street = $_POST['street'] ?? '';
+    $housenumber = $_POST['housenumber'] ?? '';
+    $addition = $_POST['address addition'] ?? '';
+    $zipcode = $_POST['zip'] ?? '';
+    $city = $_POST['city'] ?? '';
+    $province = $_POST['province'] ??'';
+    $country = $_POST['country'] ?? '';
+    $message = $_POST['message'] ?? '';
+    $contactmethod = $_POST['contact'] ?? '';
 
     // Valideren van de data
-    if (!empty($geslacht)) {
-      $valid = true;
+    if (empty($gender)) {
+      $genderErr = 'Select your gender.';
     }
-    else {
-      $valid = false;
-      $geslachtErr = 'Selecteer een geslacht.';
+    if (empty($name)) {
+      $nameErr = 'Insert a name.'; 
     }
-    if (!empty($naam)) {
-      $valid = true;
+    if (empty($message)) {
+      $messageErr = "Write your message";
     }
-    else {
-      $valid = false;
-      $naamErr = 'Voer een naam in.'; 
+    if (empty($contactmethod)) {
+      $contactmethodErr = "Choose your preferred contact method";
     }
-    // if (!empty($email)) {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $emailErr = "Voer een email in.";
-    // }
-    // if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $emailErr = itoast("Ongeldig e-mailadres", "error", "Extra opties hier");
-    // }
-    // if (!empty($telefoon)) {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $telefoonErr = 'Voer een telefoonnummer in.';
-    // }
-
-    // if (!empty($straat))
-    // {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $straatErr = "Voer een straat naam in.";
-    // }
-
-    // if (!empty($huisnummer)){
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $huisnummerErr = "Voer een huisnummer in.";
-    // }
-
-    // if (!empty($postcode)) {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $postcodeErr = "Voer een postcode in.";
-    // }
-
-    // if (!empty($stad)) {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $stadErr = "Voer een stand in.";
-    // }
-
-    // if (!empty($land)) {
-    //   $valid = true;
-    // }
-    // else {
-    //   $valid = false;
-    //   $landErr = "Voer een land in";
-    // }
-
-    if (!empty($bericht)) {
-      $valid = true;
+    if ($contactmethod === 'email' && (!filter_var($email, FILTER_VALIDATE_EMAIL) || empty($email))) {
+      $emailErr = 'Insert a valid e-mailaddress.';
     }
-    else {
-      $valid = false;
-      $landErr = "Schrijf een bericht";
+    if ($contactmethod === 'phone' && empty($phone)) {
+      $phoneErr = 'Insert a phone number.';
     }
-
-    if ($contactmethode === 'Email' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $valid = false;
-      $emailErr = 'Voer een geldig e-mailadres in.';
+    if ($contactmethod === 'post' && (empty($street) || empty($housenumber) || empty($zipcode) || empty($city) || empty($province) || empty($country))) {
+      $streetErr = 'Inster a street name.';
+      $housenumberErr = 'Insert a house number.';
+      $zipcodeErr = 'Insert a zip code.';
+      $cityErr = 'Insert a city.';
+      $provinceErr = 'Insert a province.';
+      $countryErr = 'Insert a country.';
     }
-    else {
-      $valid = true;
-    }
-    if ($contactmethode === 'Telefoon' && empty($telefoon)) {
-      $valid = false;
-      $telefoonErr = 'Voer een telefoonnummer in.';
-    }
-    else {
-      $valid = true;
-    }
-    if ($contactmethode === 'Post' && (empty($straat) || empty($huisnummer) || empty($postcode) || empty($stad) || empty($provincie) || empty($land))) {
-      $valid = false;
-      $straatErr = 'Voer een straatnaam in.';
-      $huisnummerErr = 'Voer een huisnummer in.';
-      $postcodeErr = 'Voer een postcode in.';
-      $stadErr = 'Voer een stad in.';
-      $provincieErr = 'Voer een provincie in.';
-      $landErr = 'Voer een land in.';
-    }
-    else {
+    
+    if (empty($genderErr) && empty($nameErr) && empty($emailErr) && empty($phoneErr) 
+    && empty($streetErr) && empty($housenumberErr) && empty($zipcodeErr) && empty($cityErr)
+    && empty($provinceErr) && empty($countryErr) && empty($messageErr) && empty($contactmethodErr)) {
       $valid = true;
     }
   }
@@ -160,125 +81,127 @@
     </nav>
     <br>
     <?php if (!$valid) { /* Show the next part only when $valid is false */ ?>
-      <div class="formcarry-container">
-        <form action="#" method="POST" class="formcarry-form">
-          <select naam="geslacht" id="geslacht" required>
-            <option value="">-Selecteer Gender-</option>
-            <option value="hr">Hr</option>
-            <option value="mw">Mw</option>
-            <option value="anders">anders</option>
-          </select>
+    <div class="formcarry-container">
+      <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST" class="formcarry-form">
+        <select name="gender" id="gender">
+          <option value="">-Select your Gender-</option>
+          <option value="male" <?php if (isset($_POST['gender']) && $_POST['gender']=='male') echo 'selected="selected"';?>>Male</option>
+          <option value="female" <?php if (isset($_POST['gender']) && $_POST['gender']=='female') echo 'selected="selected"';?>>Female</option>
+          <option value="other" <?php if (isset($_POST['gender']) && $_POST['gender']=='other') echo 'selected="selected"';?>>Other</option>
+        </select>
+        <span class="error">* <?php echo $genderErr; ?></span>
+        <br>
+        <br>
+        <div class="input">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" value="<?php echo $name; ?>" />
+          <span class="error">* <?php echo $nameErr; ?></span>
           <br>
           <br>
-          <div class="input">
-            <label for="naam">Naam</label>
-            <input type="text" id="naam" naam="naam" required value="<?php echo $naam; ?>"/>
-            <span class="error">* <?php echo $naamErr; ?></span>
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email"  value="<?php echo $email; ?>" id="email" />
+          <span class="error"> <?php echo $emailErr; ?></span>
+          <br>
+          <br>
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone"  placeholder="123-45-678" value="<?php echo $phone; ?>" />
+          <span class="error"> <?php echo $phoneErr; ?></span>
+          <br>
+          <br>
+          <div class="wrapper">
+            <label for="address-one">Street</label>
+            <input autocomplete="address-line1"  type="text" id="street" name="street" value="<?php echo $street; ?>">
+            <span class="error"> <?php echo $streetErr; ?></span>
             <br>
             <br>
-            <label for="email">Email Address</label>
-            <input type="email" id="email" naam="email" value="<?php echo $email; ?>" id="email" />
-            <span class="error">* <?php echo $emailErr; ?></span>
+            <label for="address-one">House number</label>
+            <input autocomplete="address-line1"  type=" number" id="housenumber" name="housenumber"
+              value="<?php echo $housenumber; ?>">
+            <span class="error"> <?php echo $housenumberErr; ?></span>
             <br>
             <br>
-            <label for="telefoon">Telefoonnummer</label>
-            <input type="tel" id="telefoon" naam="telefoon" placeholder="123-45-678" value="<?php echo $telefoon; ?>" />
-            <span class="error">* <?php echo $telefoonErr; ?></span>
-            <br>
-            <br>
-            <div class="wrapper">
-              <label for="address-one">Straat</label>
-              <input autocomplete="address-line1" type="text" id="straat" naam="straat" value="<?php echo $straat; ?>">
-              <span class="error">* <?php echo $straatErr; ?></span>
-              <br>
-              <br>
-              <label for="address-one">Huisnummer</label>
-              <input autocomplete="address-line1" type="nummer" id="huisnummer" naam="huisnummer" value="<?php echo $huisnummer; ?>">
-              <span class="error">* <?php echo $huisnummerErr; ?></span>
-              <br>
-              <br>
-              <label for="address-one">Toevoeging</label>
-              <input autocomplete="address-line1" type="text" id="address toevoeging" naam="address toevoeging">
-            </div>
-            <br>
-            <div>
-              <label for="zip">Postcode</label>
-              <input autocomplete="postal-code" type="text" id="zip" naam="zip" value="<?php echo $postcode; ?>">
-              <span class="error">* <?php echo $postcodeErr; ?></span>
-            </div>
-            <br>
-            <div>
-              <label for="stad">Stad</label>
-              <input autocomplete="address-level2" type="text" id="stad" naam="stad" value="<?php echo $stad; ?>">
-              <span class="error">* <?php echo $stadErr; ?></span>
-            </div>
-            <br>
-            <div>
-              <label for="provincie">Provincie</label>
-              <input autocomplete="address-level1" type="text" id="provincie" naam="provincie" value="<?php echo $provincie; ?>">
-              <span class="error">* <?php echo $provincieErr; ?></span>
-            </div>
-            <br>
-            <div>
-              <label for="land">Land</label>
-              <input autocomplete="land" type="text" id="land" naam="land" value="<?php echo $land; ?>">
-              <span class="error">* <?php echo $landErr; ?></span>
-            </div>
-            <br>
-            <label for="bericht">Uw Bericht</label>
-            <textarea naam="bericht" id="bericht" cols="30" rows="10" value="<?php echo $bericht; ?>"></textarea>
-            <span class="error">* <?php echo $berichtErr; ?></span>
-            <br>
-            <br>
-            <fieldset>
-              <legend>Selecteer de gewenste contactmethode:</legend>
-              <div>
-                <input type="radio" id="contactChoice1" naam="contact" value="email" required />
-                <label for="contactChoice1">Email</label>
-                <span class="error">* <?php echo $contactmethodeErr; ?></span>
-                <input type="radio" id="contactChoice2" naam="contact" value="telefoon" required />
-                <label for="contactChoice2">Telefoon</label>
-                <span class="error">* <?php echo $contactmethodeErr; ?></span>
-                <input type="radio" id="contactChoice3" naam="contact" value="Post" required />
-                <label for="contactChoice3">Post</label>
-                <span class="error">* <?php echo $contactmethodeErr; ?></span>
-              </div>
-            </fieldset>
+            <label for="address-one">Addition</label>
+            <input autocomplete="address-line1" type="text" id="address addition" name="address addition">
           </div>
+          <br>
+          <div>
+            <label for="zip">Zip code</label>
+            <input autocomplete="postal-code"  type="text" id="zip" name="zip" value="<?php echo $zipcode; ?>">
+            <span class="error"><?php echo $zipcodeErr; ?></span>
+          </div>
+          <br>
+          <div>
+            <label for="city">City</label>
+            <input autocomplete="address-level2"  type="text" id="city" name="city" value="<?php echo $city; ?>">
+            <span class="error"> <?php echo $cityErr; ?></span>
+          </div>
+          <br>
+          <div>
+            <label for="province">Province</label>
+            <input autocomplete="address-level1"  type="text" id="province" name="province"
+              value="<?php echo $province; ?>">
+            <span class="error"> <?php echo $provinceErr; ?></span>
+          </div>
+          <br>
+          <div>
+            <label for="country">Country</label>
+            <input autocomplete="country"  type="text" id="country" name="country" value="<?php echo $country; ?>">
+            <span class="error"> <?php echo $countryErr; ?></span>
+          </div>
+          <br>
+          <label for="message">Your Message</label>
+          <br>
+          <textarea name="message" id="message"  cols="30" rows="10" value="<?php echo $message; ?>"></textarea>
+          <span class="error">* <?php echo $messageErr; ?></span>
+          <br>
+          <br>
+          <fieldset>
+            <legend>Select the preferred contact method:</legend>
+            <div>
+              <input type="radio" id="contactChoice1" name="contact" value="email"  <?php if (isset($_POST['contact']) && $_POST['contact']=='email') echo ' checked="checked"';?> />
+              <label for="contactChoice1">Email</label>
+              <input type="radio" id="contactChoice2" name="contact" value="phone"  <?php if (isset($_POST['contact']) && $_POST['contact']=='phone') echo ' checked="checked"';?>/>
+              <label for="contactChoice2">Phone</label>
+              <input type="radio" id="contactChoice3" name="contact" value="post"  <?php if (isset($_POST['contact']) && $_POST['contact']=='post') echo ' checked="checked"';?>/>
+              <label for="contactChoice3">Post</label>
+              <span class="error">* <?php echo $contactmethodErr; ?></span>
+            </div>
+          </fieldset>
+        </div>
         <br>
         <br>
         <button type="submit">Verstuur</button>
       </form>
       <?php } else { /* Show the next part only when $valid is true */ ?>
-        <p>Bedankt voor uw reactie:</p> 
-        <?php echo "<h2>Uw ingevoerde gegevens:</h2>";?>
-        <?php echo "<br>";?>
-        <div>Geslacht: <?php echo $geslacht; ?></div>
-        <?php echo "<br>";?>
-        <div>Naam: <?php echo $naam; ?></div>
-        <?php echo "<br>";?>
-        <div>Email: <?php echo $email; ?></div>
-        <?php echo "<br>";?>
-        <div>Telefoonnummer: <?php echo $telefoon; ?></div>
-        <?php echo "<br>";?>
-        <div>Straat: <?php echo $straat; ?></div>
-        <?php echo "<br>";?>
-        <div>Huisnummer: <?php echo $huisnummer; ?></div>
-        <?php echo "<br>";?>
-        <div>Toevoeging: <?php echo $toevoeging; ?></div>
-        <?php echo "<br>";?>
-        <div>Postcode: <?php echo $postcode; ?></div>
-        <?php echo "<br>";?>
-        <div>Provincie: <?php echo $provincie; ?></div>
-        <?php echo "<br>";?>
-        <div>Stad <?php echo $stad; ?></div>
-        <?php echo "<br>";?>
-        <div>Land: <?php echo $land; ?></div>
-        <?php echo "<br>";?>
-        <div>Bericht: <?php echo $bericht; ?></div>
-        <?php echo "<br>";?>
-        <div>Contactmethode: <?php echo $contactmethode; ?></div>
-    <?php } /* End of conditional showing */ ?>
+      <p>Thank you for your submission:</p>
+      <?php echo "<h2>Your input:</h2>";?>
+      <?php echo "<br>";?>
+      <div>Gender: <?php echo $gender; ?></div>
+      <?php echo "<br>";?>
+      <div>Name: <?php echo $name; ?></div>
+      <?php echo "<br>";?>
+      <div>Email: <?php echo $email; ?></div>
+      <?php echo "<br>";?>
+      <div>Phone number: <?php echo $phone; ?></div>
+      <?php echo "<br>";?>
+      <div>Street: <?php echo $street; ?></div>
+      <?php echo "<br>";?>
+      <div>House number: <?php echo $housenumber; ?></div>
+      <?php echo "<br>";?>
+      <div>Addition: <?php echo $addition; ?></div>
+      <?php echo "<br>";?>
+      <div>Zip code: <?php echo $zipcode; ?></div>
+      <?php echo "<br>";?>
+      <div>Province: <?php echo $province; ?></div>
+      <?php echo "<br>";?>
+      <div>City <?php echo $city; ?></div>
+      <?php echo "<br>";?>
+      <div>Country: <?php echo $country; ?></div>
+      <?php echo "<br>";?>
+      <div>Message: <?php echo $message; ?></div>
+      <?php echo "<br>";?>
+      <div>Contact method: <?php echo $contactmethod; ?></div>
+      <?php } /* End of conditional showing */ ?>
     </div>
   </div>
 </body>

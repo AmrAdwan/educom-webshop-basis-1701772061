@@ -14,6 +14,7 @@
       <li><a href="index.php?page=home">Home</a></li>
       <li><a href="index.php?page=about"> About </a></li>
       <li><a href="index.php?page=contact">Contact </a></li>
+      <li><a href="index.php?page=register">Register </a></li>
     </ul>
   </nav>
   <?php echo "<br>"; ?>
@@ -22,6 +23,8 @@
     $formData = $formResult['formData'] ?? []; ?>
     <div class="formcarry-container">
       <form action="index.php" method="POST" class="formcarry-form">
+        <!-- Hidden field to identify the contact form -->
+        <input type="hidden" name="form_type" value="contact">
         <select name="gender" id="gender">
           <option value="">-Select your Gender-</option>
           <option value="male" <?php if (isset($_POST['gender']) && $_POST['gender'] == 'male') echo 'selected="selected"'; ?>>Male</option>
@@ -107,10 +110,10 @@
         </div>
         <?php echo "<br>"; ?>
         <?php echo "<br>"; ?>
-        <button type="submit">Send</button>
+        <button type="Submit">Send</button>
       </form>
-    <?php } else { /* Show the next part only when $valid is true */ 
-      $formData = $formResult['formData'] ?? [];?>
+    <?php } else { /* Show the next part only when $valid is true */
+    $formData = $formResult['formData'] ?? []; ?>
       <?php echo "<p>Thank you for your submission:</p>"; ?>
       <?php echo "<h2>Your input:</h2>"; ?>
       <?php echo "<br>"; ?>

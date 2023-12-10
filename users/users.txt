@@ -1,0 +1,6 @@
+[email]|[naam]|[wachtwoord]
+coach@man-kind.nl|Geert Weggemans|halt!
+amr.adwan@hotmail.com|Amr Adwan|amr236037
+amr.adwan6@gmail.com|amr|123
+amr.adwan@gmail.com|amr|1233
+amr.adwan33@gmail.com|amr|11

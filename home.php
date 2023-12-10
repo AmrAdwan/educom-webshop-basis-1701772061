@@ -15,6 +15,7 @@ echo "<h1>Home</h1>"; ?>
       <li><a href="index.php?page=home">Home</a></li>
       <li><a href="index.php?page=about"> About </a></li>
       <li><a href="index.php?page=contact">Contact </a></li>
+      <li><a href="index.php?page=register">Register </a></li>
     </ul>
   </nav>
   <?php echo "<p> Welcome to the homepage of this website!</p>"; ?>

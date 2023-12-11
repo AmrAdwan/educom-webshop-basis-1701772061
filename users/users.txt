@@ -4,3 +4,9 @@ amr.adwan@hotmail.com|Amr Adwan|amr236037
 amr.adwan6@gmail.com|amr|123
 amr.adwan@gmail.com|amr|1233
 amr.adwan33@gmail.com|amr|11
+amr@hotmail.com|amr|1111
+amr@gmail.com|amr|123
+amr@gmail.nl|amr|1234
+aa@gmail.nl|aa|112233
+ama@gmail.nl|ama|ama
+ama@gmail.com|ama|ama

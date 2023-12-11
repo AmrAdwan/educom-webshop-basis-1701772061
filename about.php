@@ -12,9 +12,14 @@
   <nav>
     <ul class="menu">
       <li><a href="index.php?page=home">Home</a></li>
-      <li><a href="index.php?page=about"> About </a></li>
-      <li><a href="index.php?page=contact">Contact </a></li>
-      <li><a href="index.php?page=register">Register </a></li>
+      <li><a href="index.php?page=about">About</a></li>
+      <li><a href="index.php?page=contact">Contact</a></li>
+      <?php if (isset($_SESSION['user'])) : ?>
+        <li><a href="index.php?page=logout">Logout [<?php echo htmlspecialchars($_SESSION['user']['logname']); ?>]</a></li>
+      <?php else : ?>
+        <li><a href="index.php?page=register">Register</a></li>
+        <li><a href="index.php?page=login">Login</a></li>
+      <?php endif; ?>
     </ul>
   </nav>
 

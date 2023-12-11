@@ -2,12 +2,12 @@
 <?php echo "<html>"; ?>
 
 <?php echo "<head>"; ?>
-<?php echo "<title>Register</title>"; ?>
+<?php echo "<title>Login</title>"; ?>
 <link rel="stylesheet" href="./CSS/stylesheet.css">
 <?php echo "</head>"; ?>
 
 <?php echo "<body>"; ?>
-<?php echo "<h1>Register</h1>"; ?>
+<?php echo "<h1>Login</h1>"; ?>
 
 <div class="text">
   <nav>
@@ -23,40 +23,27 @@
       <?php endif; ?>
     </ul>
   </nav>
-  <?php if (!isset($registerResult['regvalid']) || !$registerResult['regvalid']) { /* Show the next part only when $valid is false */
+  <?php if (!isset($loginResult['logvalid']) || !$loginResult['logvalid']) { /* Show the next part only when $valid is false */
     // Extract form data for convenience
-    $registerData = $registerResult['registerData'] ?? []; ?>
+    $loginData = $loginResult['loginData'] ?? []; ?>
     <div class="formcarry-container">
       <form action="index.php" method="POST" class="formcarry-form">
-        <!-- Hidden field to identify the register form -->
-        <input type="hidden" name="form_type" value="register">
+        <!-- Hidden field to identify the login form -->
+        <input type="hidden" name="form_type" value="login">
         <div class="input">
           <?php echo "<br>"; ?>
           <?php echo "<br>"; ?>
           <?php echo "<br>"; ?>
-          <label for="name">Name</label>
-          <input type="text" id="regname" name="regname" value="<?php echo htmlspecialchars($registerData['regname'] ?? '');
-                                                                ?>" />
-          <span class="error">*<?php echo $registerResult['errors']['regnameErr'] ?? '';
-                                ?></span>
-          <?php echo "<br>"; ?>
-          <?php echo "<br>"; ?>
           <label for="email">Email Address</label>
-          <input type="email" id="regemail" name="regemail" value="<?php echo htmlspecialchars($registerData['regemail'] ?? '');
+          <input type="email" id="logemail" name="logemail" value="<?php echo htmlspecialchars($loginData['logemail'] ?? '');
                                                                     ?>" />
-          <span class="error">*<?php echo $registerResult['errors']['regemailErr'] ?? '';
+          <span class="error">*<?php echo $loginResult['errors']['logemailErr'] ?? '';
                                 ?></span>
           <?php echo "<br>"; ?>
           <?php echo "<br>"; ?>
           <label for="phone">Password</label>
-          <input type="password" id="regpassword1" name="regpassword1" />
-          <span class="error">*<?php echo $registerResult['errors']['regpassword1Err'] ?? '';
-                                ?></span>
-          <?php echo "<br>"; ?>
-          <?php echo "<br>"; ?>
-          <label for="phone">Repeat Password</label>
-          <input type="password" id="regpassword2" name="regpassword2" />
-          <span class="error">*<?php echo $registerResult['errors']['regpassword2Err'] ?? '';
+          <input type="password" id="logpassword" name="logpassword" />
+          <span class="error">*<?php echo $loginResult['errors']['logpasswordErr'] ?? '';
                                 ?></span>
           <?php echo "<br>"; ?>
           <?php echo "<br>"; ?>

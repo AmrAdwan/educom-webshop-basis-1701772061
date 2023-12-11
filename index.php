@@ -1,9 +1,22 @@
 <?php
 session_start();
+
+// Database configuration
+$servername = '127.0.0.1';
+$username = 'amr_web_shop_user';
+$password = 'Amr-ma,236037';
+$dbname = 'amr_webshop';
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
+}
+
 function getRequestedPage()
 {
   // A list of allowed pages
-  $allowedPages = ['home', 'about', 'contact', 'register', 'login', 'logout'];
+  $allowedPages = ['home', 'about', 'contact', 'register', 'login', 'logout', 'change_password'];
 
   // Check if it's a POST request
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -15,6 +28,8 @@ function getRequestedPage()
         return 'contact';
       } else if ($_POST['form_type'] === 'login') {
         return 'login';
+      } elseif ($_POST['form_type'] === 'change_password') {
+        return 'change_password';
       }
     }
   }
@@ -132,20 +147,21 @@ function validateContactForm()
   ];
 }
 
-
 function validateRegisterForm()
 {
+  global $conn; // Use the global connection variable
+
   $regname = $regemail = $regpassword1 = $regpassword2 = '';
   $regnameErr = $regemailErr = $regpassword1Err = $regpassword2Err = '';
   $regvalid = false;
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $regname = $_POST['regname'] ?? '';
     $regemail = $_POST['regemail'] ?? '';
     $regpassword1 = $_POST['regpassword1'] ?? '';
     $regpassword2 = $_POST['regpassword2'] ?? '';
 
+    // Validation checks
     if (empty($regname)) {
       $regnameErr = 'Please insert your name';
     }
@@ -165,39 +181,29 @@ function validateRegisterForm()
         $regpassword2Err = 'The second password does not match the first password!';
       }
     }
-    if (isset($regemail)) {
-      // Open the file to check if the email already exists
-      $emailExists = false;
-      $myfile = fopen("users/users.txt", "r") or die("Unable to open file!");
-      while (($line = fgets($myfile)) !== false) {
-        $lineParts = explode('|', trim($line));
-        if (isset($lineParts[0]) && $lineParts[0] === $regemail) {
-          $emailExists = true;
-          $regemailErr = 'Email already exists! Please try another email';
-          break;
-        }
-      }
-      fclose($myfile);
-
-      // If the email does not exist, append new data to the file
-      if (!$emailExists && empty($regnameErr) && empty($regemailErr) && empty($regpassword1Err) && empty($regpassword2Err)) {
-        $myfile = fopen("users/users.txt", "a") or die("Unable to open file!");
-        $newLine = $regemail . "|" . $regname . "|" . $regpassword1 . "\n";
-        fwrite($myfile, $newLine);
-        fclose($myfile);
-      }
-    }
 
     if (empty($regnameErr) && empty($regemailErr) && empty($regpassword1Err) && empty($regpassword2Err)) {
-      $regvalid = true;
+      // Check if email already exists
+      $sql = "SELECT email FROM users WHERE email = '" . mysqli_real_escape_string($conn, $regemail) . "'";
+      $result = mysqli_query($conn, $sql);
+      if (mysqli_num_rows($result) > 0) {
+        $regemailErr = "Email already exists!";
+      } else {
+        // Email does not exist, insert new user
+        $hashedPassword = password_hash($regpassword1, PASSWORD_DEFAULT); // Hash the password
+        $insertSql = "INSERT INTO users (name, email, password) VALUES ('" . mysqli_real_escape_string($conn, $regname) . "', '" . mysqli_real_escape_string($conn, $regemail) . "', '$hashedPassword')";
+        if (mysqli_query($conn, $insertSql)) {
+          $regvalid = true; // Registration successful
+        } else {
+          // Handle error, e.g. database insertion failed
+          echo "Error: " . $insertSql . "<br>" . mysqli_error($conn);
+        }
+      }
+
+      mysqli_free_result($result);
     }
   }
-  $registerData = [
-    'regname' => $regname,
-    'regemail' => $regemail,
-    'regpassword1' => $regpassword1,
-    'regpassword2' => $regpassword2
-  ];
+
   return [
     'regvalid' => $regvalid,
     'errors' => [
@@ -206,9 +212,15 @@ function validateRegisterForm()
       'regpassword1Err' => $regpassword1Err,
       'regpassword2Err' => $regpassword2Err
     ],
-    'registerData' => $registerData
+    'registerData' => [
+      'regname' => $regname,
+      'regemail' => $regemail,
+      'regpassword1' => $regpassword1,
+      'regpassword2' => $regpassword2
+    ]
   ];
 }
+
 
 function getUsernameByEmail($email)
 {
@@ -238,111 +250,227 @@ function getUsernameByEmail($email)
 
 function validateLoginForm()
 {
+  global $conn; // Use the global connection variable
+
   $logemail = $logpassword = '';
   $logemailErr = $logpasswordErr = '';
   $logvalid = false;
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $logemail = $_POST['logemail'] ?? '';
     $logpassword = $_POST['logpassword'] ?? '';
 
-    // Initialize email existence and password match flags
-    $emailExists = false;
-    $passwordMatches = false;
+    // Check if email and password are not empty
+    if (empty($logemail)) {
+      $logemailErr = 'Please enter your email.';
+      return [
+        'logvalid' => $logvalid,
+        'errors' => ['logemailErr' => $logemailErr, 'logpasswordErr' => $logpasswordErr],
+        'loginData' => ['logemail' => $logemail, 'logpassword' => $logpassword]
+      ];
+    }
 
-    if (!empty($logemail) && !empty($logpassword)) {
-      // Open the file to check if the email exists and password matches
-      $myfile = fopen("users/users.txt", "r") or die("Unable to open file!");
-      while (($line = fgets($myfile)) !== false) {
-        $lineParts = explode('|', trim($line));
-        if (isset($lineParts[0]) && $lineParts[0] === $logemail) {
-          $emailExists = true;
-          if (isset($lineParts[2]) && trim($lineParts[2]) === $logpassword) {
-            $passwordMatches = true;
-            break;
-          }
-        }
-      }
-      fclose($myfile);
+    if (empty($logpassword)) {
+      $logpasswordErr = 'Please enter your password.';
+      return [
+        'logvalid' => $logvalid,
+        'errors' => ['logemailErr' => $logemailErr, 'logpasswordErr' => $logpasswordErr],
+        'loginData' => ['logemail' => $logemail, 'logpassword' => $logpassword]
+      ];
+    }
 
-      if (!$emailExists) {
-        $logemailErr = 'Email address not found. Please try again or register.';
-      } elseif (!$passwordMatches) {
+    // Prepare and execute the SQL statement
+    $sql = "SELECT name, password FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $logemail);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+      if (password_verify($logpassword, $row['password'])) {
+        $_SESSION['user'] = ['logemail' => $logemail, 'logname' => $row['name']];
+        $logvalid = true;
+      } else {
         $logpasswordErr = 'Incorrect password. Please try again.';
       }
     } else {
-      if (empty($logemail)) {
-        $logemailErr = 'Please enter your email.';
-      }
-      if (empty($logpassword)) {
-        $logpasswordErr = 'Please enter your password.';
-      }
+      $logemailErr = 'Email address not found. Please try again or register.';
     }
 
-    // Inside your validateLoginForm function
-    if ($emailExists && $passwordMatches) {
-      $userName = getUsernameByEmail($logemail);
-      if ($userName !== null) {
-        $_SESSION['user'] = ['logemail' => $logemail, 'logname' => $userName];
-        $logvalid = true;
-      }
-    }
+    mysqli_free_result($result);
   }
-
-  $loginData = [
-    'logemail' => $logemail,
-    'logpassword' => $logpassword
-  ];
 
   return [
     'logvalid' => $logvalid,
-    'errors' => [
-      'logemailErr' => $logemailErr,
-      'logpasswordErr' => $logpasswordErr
-    ],
-    'loginData' => $loginData
+    'errors' => ['logemailErr' => $logemailErr, 'logpasswordErr' => $logpasswordErr],
+    'loginData' => ['logemail' => $logemail, 'logpassword' => $logpassword]
+  ];
+}
+
+
+function validateChangePasswordForm()
+{
+  global $conn; // Use the global connection variable
+
+  $old_password = $new_password = $confirm_new_password = '';
+  $old_passwordErr = $new_passwordErr = $confirm_new_passwordErr = '';
+  $changevalid = false;
+
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $old_password = $_POST['old_password'] ?? '';
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_new_password = $_POST['confirm_new_password'] ?? '';
+
+    // Validation checks
+    if (empty($old_password)) {
+      $old_passwordErr = 'Please enter your old password.';
+    }
+    if (empty($new_password)) {
+      $new_passwordErr = 'Please enter a new password.';
+    }
+    if ($new_password !== $confirm_new_password) {
+      $confirm_new_passwordErr = 'Passwords do not match.';
+    }
+
+    // Check old password and update new password
+    if (empty($old_passwordErr) && empty($new_passwordErr) && empty($confirm_new_passwordErr)) {
+      $email = $_SESSION['user']['logemail'];
+      // Query to fetch the user's current password
+      $sql = "SELECT password FROM users WHERE email = ?";
+      $stmt = mysqli_prepare($conn, $sql);
+      mysqli_stmt_bind_param($stmt, "s", $email);
+      mysqli_stmt_execute($stmt);
+      $result = mysqli_stmt_get_result($stmt);
+
+      if ($row = mysqli_fetch_assoc($result)) {
+        if (password_verify($old_password, $row['password'])) {
+          // Update password
+          $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
+          $updateSql = "UPDATE users SET password = ? WHERE email = ?";
+          $updateStmt = mysqli_prepare($conn, $updateSql);
+          mysqli_stmt_bind_param($updateStmt, "ss", $hashedPassword, $email);
+          if (mysqli_stmt_execute($updateStmt)) {
+            $changevalid = true;
+          }
+          mysqli_stmt_close($updateStmt);
+        } else {
+          $old_passwordErr = 'Incorrect old password.';
+        }
+      }
+      mysqli_stmt_close($stmt);
+    }
+  }
+  return [
+    'changevalid' => $changevalid,
+    'old_passwordErr' => $old_passwordErr,
+    'new_passwordErr' => $new_passwordErr,
+    'confirm_new_passwordErr' => $confirm_new_passwordErr
   ];
 }
 
 
 
+// function showResponsePage($page)
+// {
+//   if ($page === 'contact') {
+//     $formResult = ['valid' => false, 'errors' => []];
+
+//     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//       // Form was submitted, validate form
+//       $formResult = validateContactForm();
+//     }
+//     // include 'contact.php';
+//   } elseif ($page === 'register') {
+//     $registerResult = ['regvalid' => false, 'errors' => []];
+//     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//       // RegisterForm was submitted, validate form
+//       $registerResult = validateRegisterForm();
+//     }
+//     if ($registerResult['regvalid']) {
+//       $_SESSION['registration_success'] = true;
+//       // Set $page to 'login' to include login page
+//       $page = 'login';
+//     }
+//   }
+
+//   if ($page === 'login') {
+//     $loginResult = ['logvalid' => false, 'errors' => []];
+//     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//       // LoginForm was submitted, validate form
+//       $loginResult = validateLoginForm();
+//     }
+//     if ($loginResult['logvalid']) {
+//       // Login is valid, redirect to home page
+//       include 'home.php';
+//     } else {
+//       // Login is not valid, include the login page for user to try again
+//       include 'login.php';
+//       return; // Stop further execution to prevent loading other pages
+//     }
+//   } else {
+//     switch ($page) {
+//       case 'home':
+//         include 'home.php';
+//         break;
+//       case 'about':
+//         include 'about.php';
+//         break;
+//       case 'contact':
+//         include 'contact.php';
+//         break;
+//       case 'register':
+//         include 'register.php';
+//         break;
+//       case 'login':
+//         include 'login';
+//         break;
+//       case 'logout':
+//         session_destroy(); // Destroy the session
+//         session_start();   // Restart the session to avoid session-related errors
+//         include 'home.php';     // Set the page to home
+//         break;
+//       case 'change_password':
+//         include 'change_password.php';
+//         break;
+//       default:
+//         include '404.php';
+//         break;
+//     }
+//   }
+// }
+
 function showResponsePage($page)
 {
   if ($page === 'contact') {
-    $formResult = ['valid' => false, 'errors' => []];
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      // Form was submitted, validate form
-      $formResult = validateContactForm();
-    }
-    // include 'contact.php';
+    $formResult = validateContactForm();
+    include 'contact.php';
   } elseif ($page === 'register') {
-    $registerResult = ['regvalid' => false, 'errors' => []];
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      // RegisterForm was submitted, validate form
-      $registerResult = validateRegisterForm();
-    }
+    $registerResult = validateRegisterForm();
     if ($registerResult['regvalid']) {
       $_SESSION['registration_success'] = true;
-      // Set $page to 'login' to include login page
       $page = 'login';
+    } else {
+      include 'register.php';
     }
-  }
-
-  if ($page === 'login') {
-    $loginResult = ['logvalid' => false, 'errors' => []];
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      // LoginForm was submitted, validate form
-      $loginResult = validateLoginForm();
-    }
+  } elseif ($page === 'login') {
+    $loginResult = validateLoginForm();
     if ($loginResult['logvalid']) {
-      // Login is valid, redirect to home page
       include 'home.php';
     } else {
-      // Login is not valid, include the login page for user to try again
       include 'login.php';
-      return; // Stop further execution to prevent loading other pages
+    }
+  } elseif ($page === 'logout') {
+    session_destroy();
+    session_start();
+    include 'home.php';
+  } elseif ($page === 'change_password') {
+    $changeResult = validateChangePasswordForm();
+    if ($changeResult['changevalid']) {
+      echo "<p>Password changed successfully.</p>";
+      include 'home.php';  // Redirect to home after successful change
+    } else {
+      include 'change_password.php';  // Show change password form with errors
     }
   } else {
     switch ($page) {
@@ -351,20 +479,6 @@ function showResponsePage($page)
         break;
       case 'about':
         include 'about.php';
-        break;
-      case 'contact':
-        include 'contact.php';
-        break;
-      case 'register':
-        include 'register.php';
-        break;
-      case 'login':
-        include 'login';
-        break;
-      case 'logout':
-        session_destroy(); // Destroy the session
-        session_start();   // Restart the session to avoid session-related errors
-        include 'home.php';     // Set the page to home
         break;
       default:
         include '404.php';
@@ -375,5 +489,8 @@ function showResponsePage($page)
 
 
 
+
 $page = getRequestedPage();
 showResponsePage($page);
+// Close the database connection at the end of the script
+$conn->close();

@@ -16,6 +16,7 @@
       <li><a href="index.php?page=contact">Contact</a></li>
       <?php if (isset($_SESSION['user'])) : ?>
         <li><a href="index.php?page=logout">Logout [<?php echo htmlspecialchars($_SESSION['user']['logname']); ?>]</a></li>
+        <li><a href="index.php?page=change_password">Change Password</a></li>
       <?php else : ?>
         <li><a href="index.php?page=register">Register</a></li>
         <li><a href="index.php?page=login">Login</a></li>

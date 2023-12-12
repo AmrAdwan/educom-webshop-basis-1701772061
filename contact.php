@@ -31,7 +31,7 @@
       <form action="index.php" method="POST" class="formcarry-form">
         <!-- Hidden field to identify the contact form -->
         <input type="hidden" name="form_type" value="contact">
-        <select name="gender" id="gender">
+        <select name="gender" id="gender" class="select">
           <option value="">-Select your Gender-</option>
           <option value="male" <?php if (isset($_POST['gender']) && $_POST['gender'] == 'male') echo 'selected="selected"'; ?>>Male</option>
           <option value="female" <?php if (isset($_POST['gender']) && $_POST['gender'] == 'female') echo 'selected="selected"'; ?>>Female</option>

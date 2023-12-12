@@ -221,33 +221,6 @@ function validateRegisterForm()
   ];
 }
 
-
-function getUsernameByEmail($email)
-{
-  $filename = "users/users.txt";
-
-  // Check if the file exists
-  if (!file_exists($filename)) {
-    die("File not found");
-  }
-
-  $file = fopen($filename, "r");
-
-  while (($line = fgets($file)) !== false) {
-    // Split the line into parts
-    $parts = explode('|', trim($line));
-
-    // Check if the email matches and return the username
-    if (count($parts) === 3 && $parts[0] === $email) {
-      fclose($file);
-      return $parts[1]; // Return the username
-    }
-  }
-
-  fclose($file);
-  return null; // Return null if no match found
-}
-
 function validateLoginForm()
 {
   global $conn; // Use the global connection variable
@@ -328,6 +301,8 @@ function validateChangePasswordForm()
     }
     if (empty($new_password)) {
       $new_passwordErr = 'Please enter a new password.';
+    } elseif ($new_password === $old_password) {
+      $new_passwordErr = 'New password cannot be the same as the old password.';
     }
     if ($new_password !== $confirm_new_password) {
       $confirm_new_passwordErr = 'Passwords do not match.';
@@ -369,77 +344,6 @@ function validateChangePasswordForm()
   ];
 }
 
-
-
-// function showResponsePage($page)
-// {
-//   if ($page === 'contact') {
-//     $formResult = ['valid' => false, 'errors' => []];
-
-//     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//       // Form was submitted, validate form
-//       $formResult = validateContactForm();
-//     }
-//     // include 'contact.php';
-//   } elseif ($page === 'register') {
-//     $registerResult = ['regvalid' => false, 'errors' => []];
-//     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//       // RegisterForm was submitted, validate form
-//       $registerResult = validateRegisterForm();
-//     }
-//     if ($registerResult['regvalid']) {
-//       $_SESSION['registration_success'] = true;
-//       // Set $page to 'login' to include login page
-//       $page = 'login';
-//     }
-//   }
-
-//   if ($page === 'login') {
-//     $loginResult = ['logvalid' => false, 'errors' => []];
-//     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//       // LoginForm was submitted, validate form
-//       $loginResult = validateLoginForm();
-//     }
-//     if ($loginResult['logvalid']) {
-//       // Login is valid, redirect to home page
-//       include 'home.php';
-//     } else {
-//       // Login is not valid, include the login page for user to try again
-//       include 'login.php';
-//       return; // Stop further execution to prevent loading other pages
-//     }
-//   } else {
-//     switch ($page) {
-//       case 'home':
-//         include 'home.php';
-//         break;
-//       case 'about':
-//         include 'about.php';
-//         break;
-//       case 'contact':
-//         include 'contact.php';
-//         break;
-//       case 'register':
-//         include 'register.php';
-//         break;
-//       case 'login':
-//         include 'login';
-//         break;
-//       case 'logout':
-//         session_destroy(); // Destroy the session
-//         session_start();   // Restart the session to avoid session-related errors
-//         include 'home.php';     // Set the page to home
-//         break;
-//       case 'change_password':
-//         include 'change_password.php';
-//         break;
-//       default:
-//         include '404.php';
-//         break;
-//     }
-//   }
-// }
-
 function showResponsePage($page)
 {
   if ($page === 'contact') {
@@ -449,7 +353,7 @@ function showResponsePage($page)
     $registerResult = validateRegisterForm();
     if ($registerResult['regvalid']) {
       $_SESSION['registration_success'] = true;
-      $page = 'login';
+      include 'login.php';
     } else {
       include 'register.php';
     }
@@ -486,9 +390,6 @@ function showResponsePage($page)
     }
   }
 }
-
-
-
 
 $page = getRequestedPage();
 showResponsePage($page);

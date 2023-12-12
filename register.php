@@ -34,7 +34,6 @@
         <div class="input">
           <?php echo "<br>"; ?>
           <?php echo "<br>"; ?>
-          <?php echo "<br>"; ?>
           <label for="name">Name</label>
           <input type="text" id="regname" name="regname" value="<?php echo htmlspecialchars($registerData['regname'] ?? '');
                                                                 ?>" />

@@ -34,7 +34,6 @@
         <div class="input">
           <?php echo "<br>"; ?>
           <?php echo "<br>"; ?>
-          <?php echo "<br>"; ?>
           <label for="email">Email Address</label>
           <input type="email" id="logemail" name="logemail" value="<?php echo htmlspecialchars($loginData['logemail'] ?? '');
                                                                     ?>" />

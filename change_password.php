@@ -25,33 +25,31 @@
     </ul>
   </nav>
   <?php echo "<br>"; ?>
-  <?php if (!isset($changeResult['changevalid']) || !$changeResult['changevalid']) { /* Show the next part only when $valid is false */
-    // Extract form data for convenience
-    // $changeData = $changeResult['changeData'] ?? []; ?>
+  <?php if (!isset($changeResult['changevalid']) || !$changeResult['changevalid']) { /* Show the next part only when $valid is false */ ?>
     <div class="formcarry-container">
-    <form action="index.php" method="post" class="formcarry-form">
-      <!-- Hidden field to identify the change_password form -->
-      <input type="hidden" name="form_type" value="change_password">
+      <form action="index.php" method="post" class="formcarry-form">
+        <!-- Hidden field to identify the change_password form -->
+        <input type="hidden" name="form_type" value="change_password">
         <label for="old_password">Old Password:</label>
         <input type="password" id="old_password" name="old_password"><br>
         <span class="error">*<?php echo $changeResult['old_passwordErr'] ?? '';
-                                ?></span>
+                              ?></span>
         <?php echo "<br>"; ?>
         <?php echo "<br>"; ?>
         <label for="new_password">New Password:</label>
         <input type="password" id="new_password" name="new_password"><br>
         <span class="error">*<?php echo $changeResult['new_passwordErr'] ?? '';
-                                ?></span>
+                              ?></span>
         <?php echo "<br>"; ?>
         <?php echo "<br>"; ?>
         <label for="confirm_new_password">Confirm New Password:</label>
         <input type="password" id="confirm_new_password" name="confirm_new_password"><br>
         <span class="error">*<?php echo $changeResult['confirm_new_passwordErr'] ?? '';
-                                ?></span>
+                              ?></span>
         <?php echo "<br>"; ?>
         <?php echo "<br>"; ?>
         <button type="Submit">Send</button>
-    </form>
+      </form>
     <?php } ?>
     </div>
 </div>
